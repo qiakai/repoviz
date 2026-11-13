@@ -1,0 +1,5 @@
+# Shell scripts must stay LF for POSIX execution on all platforms
+*.sh text eol=lf
+
+# Markdown & docs
+*.md text eol=lf

@@ -143,4 +143,4 @@ repoviz/
 
 ## License
 
-Apache-2.0 — embed the diagrams anywhere.
+MIT — embed the diagrams anywhere.
