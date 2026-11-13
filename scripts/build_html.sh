@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# repoviz build_html.sh — compile diagram URLs + notes + source evidence into a
+# repoviz build_html.sh -- compile diagram URLs + notes + source evidence into a
 # standalone HTML report.
 # Usage: sh scripts/build_html.sh "<title>" "<output.html>" '<json>'
 #   json = [{"title":"...","url":"https://x-cmd.com/draw/...","note":"...","ev":"node|file|symbol|lines|level;..."}, ...]
@@ -11,7 +11,7 @@
 # restricted to draw render URLs (https?://.../draw...), so the generated page can
 # only load images from the renderer, never arbitrary tracking origins. The page's
 # own JS makes no network requests; its <img> elements fetch the supplied draw URLs
-# when viewed — the same exposure as embedding an image in any web page (see the
+# when viewed -- the same exposure as embedding an image in any web page (see the
 # confidentiality rule in SKILL.md).
 set -u
 
@@ -34,8 +34,9 @@ dir=${out%/*}
 [ "$dir" = "$out" ] && dir=.
 [ -d "$dir" ] || mkdir -p "$dir" || die "cannot create directory: $dir"
 
-# Phase 1 — parse the JSON array into TSV rows: title \t url \t note \t evidence
-# Only http(s) draw render URLs are accepted — arbitrary origins are rejected.
+# Phase 1 -- parse the JSON array into TSV rows: title \t url \t note \t evidence
+# Renderer allowlist: only https://x-cmd.com / https://www.x-cmd.com draw URLs --
+# any other host is dropped (HTML escaping cannot constrain network requests).
 items=$(printf '%s' "$json" | awk '
   BEGIN { RS = "}" }
   function field(rec, key,   re, s) {
@@ -50,18 +51,18 @@ items=$(printf '%s' "$json" | awk '
   }
   {
     t = field($0, "title"); u = field($0, "url"); n = field($0, "note"); v = field($0, "ev")
-    if (u ~ /^https?:\/\// && u ~ /\/draw[\/?]/) printf "%s\t%s\t%s\t%s\n", t, u, n, v
+    if (u ~ /^https:\/\/(www\.)?x-cmd\.com\/draw([\/?]|$)/) printf "%s\t%s\t%s\t%s\n", t, u, n, v
   }
 ')
 
-[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries — url must be a draw render URL (https://.../draw...); example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
+[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries -- url must be an x-cmd.com draw render URL (https://x-cmd.com/draw...); example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
 
-# Phase 2 — render the standalone report
+# Phase 2 -- render the standalone report
 printf '%s\n' "$items" | awk -F '\t' -v doc="$doc_title" -v docfile="$out" '
   function esc(s)   { gsub(/&/, "\\&amp;", s); gsub(/</, "\\&lt;", s); gsub(/>/, "\\&gt;", s); gsub(/"/, "\\&quot;", s); return s }
   function explore(u) {
     if (u ~ /\/draw\/explore/) return u
-    if (u ~ /\/draw\/c\//) return u            # short link: no known editor form — keep as-is
+    if (u ~ /\/draw\/c\//) return u            # short link: no known editor form -- keep as-is
     sub(/\/draw\//, "/draw/explore/", u)
     sub(/\/draw\?/, "/draw/explore?", u)
     return u

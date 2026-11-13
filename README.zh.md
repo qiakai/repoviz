@@ -87,7 +87,8 @@
 
 ```bash
 # 通过 skills CLI 安装（适用 Claude Code、Cursor、Windsurf、Codex 等）
-npx skills add qiakai/repoviz
+# （skills CLI 锁定 1.8.1 —— 与本文档验证时一致的版本）
+npx skills@1.8.1 add qiakai/repoviz
 
 # 或通过 ClawHub 安装（OpenClaw agent）
 clawhub install repoviz
@@ -169,9 +170,13 @@ git clone https://github.com/qiakai/repoviz ~/.cursor/skills/repoviz
   需要本机安装 draw CLI。
 - 涉密代码库建议优先使用本地 SVG/PNG 导出；在公开 README 里嵌入图表 URL 前要
   三思（图片代理会自动请求这些链接）。
-- **安装透明度**：`npx skills add qiakai/repoviz` 与其他 npx 用法一样，会按当前
-  版本从 npm 拉取 `skills` CLI。若有更高安全要求，可锁定 CLI 版本：
-  `npx skills@<version> add qiakai/repoviz`。
+- 短链是永久且公开的：`shorten.sh` 会把完整图表定义上传到 x-cmd.com，任何持有
+  `/draw/c/<hash>` 链接的人都能渲染它。包含涉密系统命名的图表绝不要使用短链。
+- 渲染白名单：导出/校验/报告脚本只请求 `https://x-cmd.com/draw...` 与
+  `https://www.x-cmd.com/draw...`，其他域名会在发起网络请求前直接拒绝。
+- **安装透明度**：快速安装命令将 `skills` CLI 锁定到 `1.8.1`
+  （`npx skills@1.8.1 add qiakai/repoviz`），避免上游 CLI 未来版本被攻陷后
+  供应链劫持。重新验证后可自行升级锁定版本。
 
 ## 仓库结构
 

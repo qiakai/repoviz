@@ -93,7 +93,8 @@ Copy a prompt, drop it in your agent (with repoviz installed), and it scans + ro
 
 ```bash
 # Install via the skills CLI (works with Claude Code, Cursor, Windsurf, Codex, ...)
-npx skills add qiakai/repoviz
+# (skills CLI pinned to 1.8.1 -- the version this README was verified against)
+npx skills@1.8.1 add qiakai/repoviz
 
 # Or via ClawHub (OpenClaw agents)
 clawhub install repoviz
@@ -182,9 +183,15 @@ printing), `scripts/inject_readme.sh`, or `scripts/validate.sh`.
   rendering; the latter needs a locally installed draw CLI.
 - For confidential codebases, prefer local SVG/PNG export, and think twice before
   embedding diagram URLs in public READMEs (image proxies fetch them automatically).
-- **Install transparency**: `npx skills add qiakai/repoviz` fetches the `skills` CLI
-  from npm at its current version, like any `npx` usage. If your threat model
-  requires it, pin the CLI version: `npx skills@<version> add qiakai/repoviz`.
+- Short links are permanent and public: `shorten.sh` uploads the full chart
+  definition to x-cmd.com, and anyone holding the `/draw/c/<hash>` link can render
+  it. Never shorten diagrams that name confidential systems.
+- Renderer allowlist: the export/validate/report scripts fetch only
+  `https://x-cmd.com/draw...` and `https://www.x-cmd.com/draw...` URLs; any other
+  origin is rejected before a network call is made.
+- **Install transparency**: the quick-start command pins the `skills` CLI to
+  `1.8.1` (`npx skills@1.8.1 add qiakai/repoviz`) so a compromised future CLI
+  release cannot rug-pull the install. Bump the pin deliberately after re-verifying.
 
 ## Repository layout
 

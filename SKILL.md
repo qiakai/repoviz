@@ -9,9 +9,11 @@ description: >
   draw a flowchart/Sankey/sequence diagram, or document system design.
 permissions: >
   Network: fetches rendered diagrams from x-cmd.com via explicit, agent-built URLs
-  (render, validate, or explicit export only). Filesystem: writes only when the user
-  explicitly asks to save/export. No package downloads, no installs, no background
-  processes, no credential access.
+  (render, validate, or explicit export only). Exception: the optional short-link
+  step (scripts/shorten.sh, explicit user opt-in) uploads the chart definition to
+  x-cmd.com, which stores it permanently and publicly. Filesystem: writes only when
+  the user explicitly asks to save/export. No package downloads, no installs, no
+  background processes, no credential access.
 ---
 
 # repoviz
@@ -161,9 +163,12 @@ bash scripts/inject_readme.sh "<README.md>" '<json>'       # insert/update diagr
 - `shorten.sh` POSTs the chart definition (the `?d=` JSON schema) to x-cmd.com —
   rate limit ~30/min/IP. Only the `?type=` family accepts POST; node/edge diagrams
   (`/draw/archmap`, `/draw/seq`, ...) return 405 — keep their full URLs. The
-  returned `/draw/c/<hash>` renders with GET and is permanent.
+  returned `/draw/c/<hash>` renders with GET and is permanent. Run it only on
+  explicit user request: the stored definition is permanent and public to anyone
+  holding the link (Step 4 confidentiality rule).
 - `build_html.sh` takes a JSON array of `{"title","url","note"[,"ev"]}` objects
-  (`url` restricted to `*/draw*` render URLs; `ev` optional, encoded
+  (`url` restricted to `https://x-cmd.com` / `https://www.x-cmd.com` draw render
+  URLs; `ev` optional, encoded
   `"node|file|symbol|lines|level;..."` — renders a filterable Source-evidence
   table) and emits a self-contained dark/light responsive report: sidebar nav,
   zoom, fullscreen, copy-URL buttons, print-to-PDF friendly. All values are

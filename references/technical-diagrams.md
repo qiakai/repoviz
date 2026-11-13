@@ -79,8 +79,9 @@ are mixing abstraction levels — split by stage (ingest / transform / serve).
 ## Use Case — `/draw/uc` (`actor` / `uc`)
 
 **When to use**: capability maps, requirement scoping, actor/system-boundary
-discussions. Trigger phrases: *"use case diagram"*, *"who can do what"*,
-*"scope the features per role"*.
+discussions. Trigger phrases: *"use case diagram"*, *"model which actors can
+perform which actions"*, *"scope the features per role"* (plain authorization
+questions deserve a textual answer -- this page is for diagram requests).
 
 - Node: `n=id;actor;Name` (stick figure) and `n=id;uc;Use case name` (ellipse).
 - Edge: `e=actor;uc` = participation. Between use cases: an edge labeled

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# repoviz export.sh — download rendered diagrams (SVG/PNG) from draw URLs.
+# repoviz export.sh -- download rendered diagrams (SVG/PNG) from draw URLs.
 # Usage:
 #   sh scripts/export.sh "<draw_url>" "<output.svg|png>"     # single
 #   sh scripts/export.sh --batch <file>                      # batch, one "url<TAB>out" per line
@@ -24,9 +24,12 @@ fetch_one() {
   url=$1
   out=$2
 
+  # Renderer allowlist: only x-cmd.com draw URLs (any other host could be a
+  # tracking pixel or data trap, and HTML escaping cannot constrain requests).
   case $url in
-    http://*"/draw"*|https://*"/draw"*) ;;
-    *) printf 'FAIL %s -> %s\n  not a draw URL\n' "$url" "$out"; return 1 ;;
+    "https://x-cmd.com/draw"|"https://x-cmd.com/draw?"*|"https://x-cmd.com/draw/"*|\
+    "https://www.x-cmd.com/draw"|"https://www.x-cmd.com/draw?"*|"https://www.x-cmd.com/draw/"*) ;;
+    *) printf 'FAIL %s -> %s\n  not an x-cmd.com draw URL (https://x-cmd.com/draw...)\n' "$url" "$out"; return 1 ;;
   esac
 
   fmt=svg
@@ -39,7 +42,7 @@ fetch_one() {
   # PNG targets need format=png; SVG targets must not carry format=png.
   if [ "$fmt" = png ]; then
     case $url in
-      *[?\&]format=*) : ;; # explicit format already set — respect it
+      *[?\&]format=*) : ;; # explicit format already set -- respect it
       *\?*)             url="$url&format=png" ;;
       *)                url="$url?format=png" ;;
     esac

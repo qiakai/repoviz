@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-# repoviz inject_readme.sh — insert/update generated diagram Markdown in a README
+# repoviz inject_readme.sh -- insert/update generated diagram Markdown in a README
 # between <!-- repoviz:start --> and <!-- repoviz:end --> markers. On first use the
 # marked section is appended to the end of the file; later runs replace it in place
-# (idempotent — safe to re-run after regenerating diagrams).
+# (idempotent -- safe to re-run after regenerating diagrams).
 # Usage: sh scripts/inject_readme.sh "<README.md>" '<json array of {title,url,note}>'
 # Value restrictions: no double quotes, no "}", no tabs/newlines inside values.
 set -u
@@ -37,11 +37,11 @@ items=$(printf '%s' "$json" | awk '
   }
   {
     t = field($0, "title"); u = field($0, "url"); n = field($0, "note")
-    if (u ~ /^https?:\/\// && u ~ /\/draw[\/?]/) printf "%s\t%s\t%s\n", t, u, n
+    if (u ~ /^https:\/\/(www\.)?x-cmd\.com\/draw([\/?]|$)/) printf "%s\t%s\t%s\n", t, u, n
   }
 ')
 
-[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries — url must be a draw render URL (https://.../draw...); example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
+[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries -- url must be an x-cmd.com draw render URL (https://x-cmd.com/draw...); example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
 
 block="${TMPDIR:-/tmp}/$PROG.$$.md"
 trap 'rm -f "$block" "$readme.repoviz-new"' 0 HUP INT TERM
@@ -67,7 +67,7 @@ if grep -q '<!-- repoviz:start -->' "$readme" && grep -q '<!-- repoviz:end -->' 
   mv "$readme.repoviz-new" "$readme"
   printf 'updated: %s (repoviz block replaced)\n' "$readme"
 else
-  # First use — append the marked section.
+  # First use -- append the marked section.
   {
     printf '\n## Diagrams\n\n'
     cat "$block"

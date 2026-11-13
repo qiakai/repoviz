@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
-# repoviz validate.sh — validation layers L1 (draw URL renders) and L2 (IR structure).
+# repoviz validate.sh -- validation layers L1 (draw URL renders) and L2 (IR structure).
 # Usage:
 #   sh scripts/validate.sh <draw_url> [draw_url...]   # L1: reachable + valid SVG/PNG
 #   sh scripts/validate.sh -                          # L1: read URLs from stdin, one per line
 #   sh scripts/validate.sh --ir <file.json>           # L2: node/edge/evidence structure
 # Exit 0 = all checks pass, 1 = a check failed, 2 = usage error.
 # Security: read-only checks. Uses the locally installed python3 (if present) to
-# parse IR JSON — nothing is downloaded, installed, or executed from a registry.
+# parse IR JSON -- nothing is downloaded, installed, or executed from a registry.
 set -u
 
 PROG=${0##*/}
@@ -68,10 +68,10 @@ for e in edges:
         continue
     for k in ("from", "to"):
         if e.get(k) not in idset:
-            fails.append(f"edge '{e.get('from','?')}→{e.get('to','?')}' dangling {k}")
+            fails.append(f"edge '{e.get('from','?')}->{e.get('to','?')}' dangling {k}")
     for ev in e.get("evidence", []):
         if ev.get("level") == "verified" and not ev.get("file"):
-            fails.append(f"edge {e.get('from','?')}→{e.get('to','?')} verified without file")
+            fails.append(f"edge {e.get('from','?')}->{e.get('to','?')} verified without file")
 
 levels = [ev.get("level") for o in nodes + edges for ev in o.get("evidence", [])]
 known = {"verified", "inferred", "unknown", None}
@@ -79,11 +79,11 @@ bad_levels = {l for l in levels if l not in known}
 if bad_levels:
     fails.append(f"bad evidence levels: {sorted(bad_levels)}")
 if len(nodes) > 20:
-    warns.append(f"{len(nodes)} nodes exceed the ~20-node budget — split the diagram")
+    warns.append(f"{len(nodes)} nodes exceed the ~20-node budget -- split the diagram")
 
 counts = {l: levels.count(l) for l in ("verified", "inferred", "unknown")}
 print(f"nodes={len(nodes)} edges={len(edges)} "
-      f"evidence: verified {counts['verified']} · inferred {counts['inferred']} · unknown {counts['unknown']}")
+      f"evidence: verified {counts['verified']} / inferred {counts['inferred']} / unknown {counts['unknown']}")
 for w in warns:
     print(f"WARN {w}")
 if fails:
@@ -95,9 +95,9 @@ PY
   fi
 
   # Portable fallback: without python3 only coarse checks are possible.
-  grep -q '"nodes"' "$f" || { echo "FAIL no \"nodes\" key (python3 absent — limited checks)"; exit 1; }
-  grep -q '"version"' "$f" || echo "WARN no \"version\" key (python3 absent — limited checks)"
-  echo "WARN python3 not found — install it for full L2 checks (dangling refs, evidence levels)"
+  grep -q '"nodes"' "$f" || { echo "FAIL no \"nodes\" key (python3 absent -- limited checks)"; exit 1; }
+  grep -q '"version"' "$f" || echo "WARN no \"version\" key (python3 absent -- limited checks)"
+  echo "WARN python3 not found -- install it for full L2 checks (dangling refs, evidence levels)"
   echo "PASS (coarse)"
   exit 0
 fi
@@ -123,9 +123,12 @@ pass=0; fail=0
 # Intentional word-splitting: one URL per argument/line.
 # shellcheck disable=SC2086
 for url in $urls; do
+  # Renderer allowlist: only x-cmd.com draw URLs (any other host could be a
+  # tracking pixel or data trap).
   case $url in
-    http://*"/draw"*|https://*"/draw"*) ;;
-    *) printf 'FAIL %s\n  not a draw URL\n' "$url"; fail=$((fail+1)); continue ;;
+    "https://x-cmd.com/draw"|"https://x-cmd.com/draw?"*|"https://x-cmd.com/draw/"*|\
+    "https://www.x-cmd.com/draw"|"https://www.x-cmd.com/draw?"*|"https://www.x-cmd.com/draw/"*) ;;
+    *) printf 'FAIL %s\n  not an x-cmd.com draw URL (https://x-cmd.com/draw...)\n' "$url"; fail=$((fail+1)); continue ;;
   esac
   ok=0
   try=0
@@ -142,7 +145,7 @@ for url in $urls; do
         if valid_svg "$tmp"; then printf 'PASS %s (svg, %s bytes)\n' "$url" "$(wc -c < "$tmp" | tr -d ' ')"; pass=$((pass+1)); else printf 'FAIL %s\n  response is not SVG\n' "$url"; fail=$((fail+1)); fi ;;
     esac
   else
-    # 4xx bodies carry a plain-text correction example — surface its first line.
+    # 4xx bodies carry a plain-text correction example -- surface its first line.
     code=$(curl -sSL -A "$UA" --max-time 30 -o "$tmp" -w '%{http_code}' "$url" 2>/dev/null)
     hint=$(head -n 1 "$tmp" 2>/dev/null | cut -c1-160)
     printf 'FAIL %s\n  HTTP %s %s\n' "$url" "$code" "$hint"
