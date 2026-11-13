@@ -41,9 +41,9 @@ Pick diagram type(s) from intent + repo shape. Read **only** the matching
 | Quantitative repo metrics (language split, coverage, growth) | Data charts (`?type=pie|hbar|gauge|combo|...`) | `references/general-charts.md` |
 | Broad "visualize this repo" | **Multi-diagram suite**: 1 `archmap` overview + 1 Sankey (data/dependency flow) or `seq` (core request flow) | the two matching references |
 
-Same-grammar siblings of `archmap` (see `references/architecture.md`): `arch2`,
-`uc` (`actor`/`uc`), `dataflow` (`process`/`store`/`source`/`sink`), `erd`
-(`table`/`view`), `class` (`class`/`iface`/`enum`). Long-tail charts (treemap,
+Same-grammar siblings of `archmap` (see `references/architecture.md`): `arch2`
+(alt skin). Data/behavior modeling: `uc`, `dataflow`, `erd`, `class` — grammars
+and live examples in `references/technical-diagrams.md`. Long-tail charts (treemap,
 funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
 
 **Scan modes** — scope the scan before reading code (user may pick; default from intent):

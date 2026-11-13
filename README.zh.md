@@ -74,6 +74,9 @@
 ```bash
 # 通过 skills CLI 安装（适用 Claude Code、Cursor、Windsurf、Codex 等）
 npx skills add qiakai/repoviz
+
+# 或通过 ClawHub 安装（OpenClaw agent）
+clawhub install repoviz
 ```
 
 手动安装——把整个目录拷进对应技能的 skills 目录即可：

@@ -77,6 +77,9 @@ Copy a prompt, drop it in your agent (with repoviz installed), and it scans + ro
 ```bash
 # Install via the skills CLI (works with Claude Code, Cursor, Windsurf, Codex, ...)
 npx skills add qiakai/repoviz
+
+# Or via ClawHub (OpenClaw agents)
+clawhub install repoviz
 ```
 
 Manual install — just copy the folder into your agent's skills directory:

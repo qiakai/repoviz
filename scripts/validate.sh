@@ -127,7 +127,14 @@ for url in $urls; do
     http://*"/draw"*|https://*"/draw"*) ;;
     *) printf 'FAIL %s\n  not a draw URL\n' "$url"; fail=$((fail+1)); continue ;;
   esac
-  if curl -fsSL -A "$UA" --max-time 30 "$url" -o "$tmp" 2>/dev/null; then
+  ok=0
+  try=0
+  # One silent retry shields CI from transient network flakes (5xx/timeouts).
+  while [ "$try" -lt 2 ] && [ "$ok" -eq 0 ]; do
+    try=$((try+1))
+    if curl -fsSL -A "$UA" --max-time 30 "$url" -o "$tmp" 2>/dev/null; then ok=1; fi
+  done
+  if [ "$ok" -eq 1 ]; then
     case $url in
       *[?\&]format=png*)
         if valid_png "$tmp"; then printf 'PASS %s (png, %s bytes)\n' "$url" "$(wc -c < "$tmp" | tr -d ' ')"; pass=$((pass+1)); else printf 'FAIL %s\n  not a valid PNG\n' "$url"; fail=$((fail+1)); fi ;;
