@@ -57,7 +57,10 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
 | `full` | all of the above | Repository Report (suite + quality report) |
 
 `impact` mode loads `references/architecture-diff.md` (git-diff delta workflow);
-multi-diagram or evidence-sensitive work loads `references/repository-ir.md`.
+`full` mode loads `references/codebase-report.md` (standard report structure);
+repeat scans of the same repo may load `references/incremental-scan.md`
+(opt-in cache protocol); multi-diagram or evidence-sensitive work loads
+`references/repository-ir.md`.
 
 ## Step 2 — Token-Disciplined Codebase Scanning
 
