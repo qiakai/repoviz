@@ -134,7 +134,9 @@ flat percent-encoded render URLs — plus, only on request, runs
 - **No uploads, no installs.** Default mode writes zero local files. The export
   scripts only download the rendered file with `curl`, with optional fallbacks to
   CLIs already installed on your machine — nothing is ever fetched from a package
-  registry or executed beyond that.
+  registry or executed beyond that. Note the export download itself contacts the
+  renderer (the URL carries the labels) — local files are not the same as offline
+  rendering; the latter needs a locally installed draw CLI.
 - For confidential codebases, prefer local SVG/PNG export, and think twice before
   embedding diagram URLs in public READMEs (image proxies fetch them automatically).
 - **Install transparency**: `npx skills add qiakai/repoviz` fetches the `skills` CLI

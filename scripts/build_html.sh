@@ -3,8 +3,12 @@
 # Usage: sh scripts/build_html.sh "<title>" "<output.html>" '<json>'
 #   json = [{"title":"...","url":"https://x-cmd.com/draw/...","note":"..."}, ...]
 # Value restrictions: no double quotes, no "}", no tabs/newlines inside values.
-# Security: every JSON-derived value is HTML-escaped (esc) before output; the
-# report is static HTML/JS with no eval and no network calls of its own.
+# Security: every JSON-derived value is HTML-escaped (esc) before output; `url` is
+# restricted to draw render URLs (https?://.../draw...), so the generated page can
+# only load images from the renderer, never arbitrary tracking origins. The page's
+# own JS makes no network requests; its <img> elements fetch the supplied draw URLs
+# when viewed — the same exposure as embedding an image in any web page (see the
+# confidentiality rule in SKILL.md).
 set -u
 
 PROG=${0##*/}
@@ -27,6 +31,7 @@ dir=${out%/*}
 [ -d "$dir" ] || mkdir -p "$dir" || die "cannot create directory: $dir"
 
 # Phase 1 — parse the JSON array into TSV rows: title \t url \t note
+# Only http(s) draw render URLs are accepted — arbitrary origins are rejected.
 items=$(printf '%s' "$json" | awk '
   BEGIN { RS = "}" }
   function field(rec, key,   re, s) {
@@ -41,11 +46,11 @@ items=$(printf '%s' "$json" | awk '
   }
   {
     t = field($0, "title"); u = field($0, "url"); n = field($0, "note")
-    if (u ~ /^https?:\/\//) printf "%s\t%s\t%s\n", t, u, n
+    if (u ~ /^https?:\/\// && u ~ /\/draw[\/?]/) printf "%s\t%s\t%s\n", t, u, n
   }
 ')
 
-[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries in the JSON payload — example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
+[ -n "$items" ] || die "no usable {\"title\",\"url\"} entries — url must be a draw render URL (https://.../draw...); example: [{\"title\":\"Architecture\",\"url\":\"https://x-cmd.com/draw/archmap?n=a;fe;A&n=b;be;B&e=a;b\",\"note\":\"2 tiers\"}]"
 
 # Phase 2 — render the standalone report
 printf '%s\n' "$items" | awk -F '\t' -v doc="$doc_title" -v docfile="$out" '

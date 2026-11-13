@@ -7,12 +7,11 @@ description: >
   with on-demand export to local SVG, PNG, or standalone interactive HTML reports.
   Use when the user asks to visualize a repo, map architecture, trace data flows,
   draw a flowchart/Sankey/sequence diagram, or document system design.
-metadata:
-  permissions: >
-    Network: fetches rendered diagrams from x-cmd.com via explicit, agent-built URLs
-    (render, validate, or explicit export only). Filesystem: writes only when the user
-    explicitly asks to save/export. No package downloads, no installs, no background
-    processes, no credential access.
+permissions: >
+  Network: fetches rendered diagrams from x-cmd.com via explicit, agent-built URLs
+  (render, validate, or explicit export only). Filesystem: writes only when the user
+  explicitly asks to save/export. No package downloads, no installs, no background
+  processes, no credential access.
 ---
 
 # repoviz
@@ -81,6 +80,8 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
 - Build the lightweight Repository IR first for suites (one shared node inventory,
   one document per diagram); map IR → URL at encode time. Schema and validation
   protocol: `references/repository-ir.md`.
+- Every URL you build carries its labels to the renderer — apply the Step 4
+  confidentiality rule before constructing, validating, or exporting it.
 - Grammar (nodes/edges/boundaries), encoding table, worked examples, and per-type
   limits live in the reference files. Follow them exactly; every example there is
   live-tested.
@@ -112,12 +113,14 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
   `/draw/<name>?q` → `/draw/explore/<name>?q` — draw's built-in interactive editor;
   link it, don't rebuild it.
 - 2–5 tight bullets per diagram. The image is the deliverable; bullets add judgment.
-- **Confidentiality**: rendering — and L1 validation — sends diagram labels (for
-  flowcharts, the entire program text) to the x-cmd.com renderer as URL parameters;
-  they can surface in server access logs (percent-encoding is not encryption), and
-  Markdown image embeds may be auto-fetched by clients or proxies. For confidential
-  repos, warn the user and get explicit approval before rendering or validating —
-  or deliver local exports instead.
+- **Confidentiality**: rendering — and L1 validation, and `export.sh` downloads —
+  sends diagram labels (for flowcharts, the entire program text) to the x-cmd.com
+  renderer as URL parameters; they can surface in server access logs (percent-encoding
+  is not encryption), and Markdown image embeds may be auto-fetched by clients or
+  proxies. Local export does **not** avoid this — the render is still requested from
+  x-cmd.com. For confidential repos, warn the user and get explicit approval before
+  rendering, validating, or exporting — or render fully offline via a locally
+  installed draw CLI.
 
 Close a suite with the quality report (real counts only — never fabricate):
 
@@ -143,9 +146,10 @@ bash scripts/build_html.sh "<title>" "<out.html>" '<json>'  # standalone report
 - `export.sh` downloads via `curl` (fallback: CLIs already installed locally — it
   never fetches or installs packages); `.png` targets auto-get `&format=png` (add
   `&scale=2|3` for higher resolution; pass `scheme=dark` — PNG defaults to light).
-- `build_html.sh` takes a JSON array of `{"title","url","note"}` objects and emits a
-  self-contained dark/light responsive report (sidebar nav, zoom, fullscreen,
-  copy-URL buttons); all values are HTML-escaped. Example payload:
+- `build_html.sh` takes a JSON array of `{"title","url","note"}` objects (`url`
+  restricted to `*/draw*` render URLs) and emits a self-contained dark/light
+  responsive report (sidebar nav, zoom, fullscreen, copy-URL buttons); all values are
+  HTML-escaped. Example payload:
   `[{"title":"Architecture","url":"https://x-cmd.com/draw/archmap?...","note":"3 tiers; gateway is the single entry"}]`
 - After exporting, print the saved path(s) and continue to output the Markdown block
   for the chat so the user gets both.
