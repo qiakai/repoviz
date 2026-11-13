@@ -129,6 +129,9 @@ git clone https://github.com/qiakai/repoviz ~/.cursor/skills/repoviz
   结果，可选回退也只调用本机已安装的 CLI——不会从软件包仓库拉取或执行任何内容。
 - 涉密代码库建议优先使用本地 SVG/PNG 导出；在公开 README 里嵌入图表 URL 前要
   三思（图片代理会自动请求这些链接）。
+- **安装透明度**：`npx skills add qiakai/repoviz` 与其他 npx 用法一样，会按当前
+  版本从 npm 拉取 `skills` CLI。若有更高安全要求，可锁定 CLI 版本：
+  `npx skills@<version> add qiakai/repoviz`。
 
 ## 仓库结构
 

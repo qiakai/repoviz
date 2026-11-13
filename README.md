@@ -137,6 +137,9 @@ flat percent-encoded render URLs — plus, only on request, runs
   registry or executed beyond that.
 - For confidential codebases, prefer local SVG/PNG export, and think twice before
   embedding diagram URLs in public READMEs (image proxies fetch them automatically).
+- **Install transparency**: `npx skills add qiakai/repoviz` fetches the `skills` CLI
+  from npm at its current version, like any `npx` usage. If your threat model
+  requires it, pin the CLI version: `npx skills@<version> add qiakai/repoviz`.
 
 ## Repository layout
 

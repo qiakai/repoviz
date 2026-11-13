@@ -23,6 +23,7 @@ https://x-cmd.com/draw/mermaid?m=<url-encoded mermaid graph>&title=...
 ```
 
 - Put the whole Mermaid program in `m=` as **one line** (statements separated by `;`), or use `%0A` for newlines.
+- **Confidentiality**: `m=` carries the entire flowchart program in the URL — for private codebases, genericize labels (e.g. `AuthService` → `auth`) or get user approval before rendering (see `SKILL.md` Step 4).
 - Encoding beyond the common table (space `%20`, `&` `%26`, `#` `%23`, newline `%0A`): `[` `%5B`, `]` `%5D`, `{` `%7B`, `}` `%7D`, `?` `%3F`, `|` `%7C`, `>` in arrows may stay literal but `%3E` is safest when a label contains it.
 - Shapes: `A[box]`, `A(text)`, `A{decision}`, `A((round))`. Edge labels: `-->|label|` or `-.->` dashed.
 

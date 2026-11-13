@@ -112,10 +112,11 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
   `/draw/<name>?q` → `/draw/explore/<name>?q` — draw's built-in interactive editor;
   link it, don't rebuild it.
 - 2–5 tight bullets per diagram. The image is the deliverable; bullets add judgment.
-- **Confidentiality**: rendering sends diagram labels to the x-cmd.com renderer as
-  URL parameters (they can surface in server access logs; percent-encoding is not
-  encryption), and Markdown image embeds may be auto-fetched by clients or proxies.
-  For confidential repos, warn the user and get explicit approval before rendering —
+- **Confidentiality**: rendering — and L1 validation — sends diagram labels (for
+  flowcharts, the entire program text) to the x-cmd.com renderer as URL parameters;
+  they can surface in server access logs (percent-encoding is not encryption), and
+  Markdown image embeds may be auto-fetched by clients or proxies. For confidential
+  repos, warn the user and get explicit approval before rendering or validating —
   or deliver local exports instead.
 
 Close a suite with the quality report (real counts only — never fabricate):
