@@ -1,6 +1,6 @@
 <div align="center">
 
-# repoviz
+# Repoviz
 
 **把任意代码库变成架构图、流程图和桑基图——零安装，Markdown 链接即出，可选 SVG/PNG/HTML 导出。**
 

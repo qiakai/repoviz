@@ -1,6 +1,6 @@
 <div align="center">
 
-# repoviz
+# Repoviz
 
 **Turn any codebase into architecture, flowchart, and Sankey diagrams — zero setup, instant Markdown URLs, optional SVG/PNG/HTML export.**
 
