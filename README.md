@@ -29,6 +29,23 @@ Markdown image link you can paste into a README, doc, or chat.
 
 ## Why repoviz?
 
+Four properties that change how diagrams live in your repo:
+
+* **🔗 URL-as-Data (AI-Native Diagrams)** — every diagram URL self-contains its
+  full structural definition. Future AI agents can read, understand, and
+  incrementally update your diagrams **directly from the URL text — zero
+  vision/multimodal tokens required**.
+* **🔄 Living Documentation** — traditional diagrams rot the moment code changes.
+  Because repoviz diagrams are lightweight text URLs, one prompt regenerates and
+  syncs every chart after a refactor (`scripts/inject_readme.sh` keeps the README
+  block updatable in place).
+* **🎨 Publication-Grade Aesthetics** — powered by [x-cmd draw](https://x-cmd.com/draw),
+  dry code structures become clean, high-readability **Architecture, Sankey,
+  Flowchart, and Sequence** visuals that make READMEs and RFCs stand out.
+* **🪶 Zero Repo Bloat** — no binary `.png` or massive `.svg` diffs cluttering your
+  Git history — with one-command local SVG / PNG / standalone HTML export whenever
+  you need offline assets.
+
 | | Raw Mermaid | Frontend-Only Generators | **repoviz** |
 |---|---|---|---|
 | Diagram variety (Sankey / Arch / Flow / Seq / Mindmap / Gantt) | Flow + Seq only | Usually one fixed type | **All six, auto-routed per intent** |

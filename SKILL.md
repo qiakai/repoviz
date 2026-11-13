@@ -186,3 +186,7 @@ bash scripts/inject_readme.sh "<README.md>" '<json>'       # insert/update diagr
 - Evidence or it didn't happen: every node/edge is verified, inferred, or flagged
   unknown — never fabricated. Keep the IR/renderer split so suites, reports, and
   future architecture diffs share one inventory; rendering stays a replaceable adapter.
+- URL-as-data incremental edits: an existing repoviz diagram is fully defined by
+  its URL — **never use vision or image-reading tools** to inspect it. Decode the
+  URL from the Markdown, diff its node/edge set against the current code, and emit
+  the updated URL in place, preserving node ids, labels, and layout conventions.
