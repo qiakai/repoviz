@@ -1,0 +1,9 @@
+# Internal working notes — not for distribution
+plan.md
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Download temp files (normally cleaned by trap)
+*.part.*
