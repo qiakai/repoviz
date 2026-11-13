@@ -1,7 +1,9 @@
 # Codebase Report — Standard Structure
 
-Read this in `full` scan mode (or when the user asks for "a report", "docs for
-the repo", "onboarding guide"). A Codebase Report is **conclusions + diagrams +
+Read this in `full` scan mode, or when the user asks for a **repository
+report** ("docs for the repo", "onboarding guide", "write up how this codebase
+works"). A bare "a report" (weather, sales, ...) is out of scope — this page
+only activates in repository context. A Codebase Report is **conclusions + diagrams +
 source evidence + notes** — not a pile of images. Every section answers one
 question; every claim either carries evidence or is visibly flagged.
 

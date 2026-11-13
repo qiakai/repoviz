@@ -136,10 +136,13 @@ Close a suite with the quality report (real counts only — never fabricate):
 Repository Analysis — <repo> (<scan_mode>, <commit>)
 Files inspected: N | Modules: N | Relationships: N
 Evidence: verified N · inferred N · unknown N
-Validation: L1 pass · L2 pass · L3: N unresolved (flagged below)
+Validation: L1 pass|skipped (privacy) · L2 pass · L3: N unresolved (flagged below)
 ```
 
-Flag every `unknown` under its diagram. For explicit "validate" requests or
+L1 is **not** automatic — it fetches the URL, i.e. it sends the diagram to
+x-cmd.com. For confidential repos run it only with the user's explicit approval
+(Step 4 confidentiality rule); otherwise report `L1 skipped (privacy)`. Flag
+every `unknown` under its diagram. For explicit "validate" requests or
 pre-export checks: `bash scripts/validate.sh <urls...>` (L1 render) and `bash
 scripts/validate.sh --ir <ir.json>` (L2 structure). L3 is your re-read of cited files.
 

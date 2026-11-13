@@ -107,10 +107,43 @@ fi
 have curl || die "curl is required for URL validation"
 
 tmp="${TMPDIR:-/tmp}/$PROG.$$"
-trap 'rm -f "$tmp"' 0 HUP INT TERM
+hdr="$tmp.hdr"
+trap 'rm -f "$tmp" "$hdr"' 0 HUP INT TERM
 
 valid_svg() { [ -s "$1" ] && head -c 5 "$1" | grep -q '<'; }
 valid_png() { [ -s "$1" ] && [ "$(od -An -tx1 -N4 "$1" 2>/dev/null | tr -d ' \n')" = "89504e47" ]; }
+
+# GET $1 -> $2 following redirects, but every hop (starting URL included) must
+# match the renderer allowlist -- curl -L alone would follow a redirect to any
+# host (compromised-redirect risk). Sets FETCH_CODE to the final HTTP status.
+# Returns 0 on 2xx, 1 otherwise. 4xx/5xx bodies are kept in $2 for diagnostics.
+# (f_-prefixed names: POSIX sh functions share the caller's variable namespace.)
+fetch_al() {
+  f_url=$1; f_out=$2; f_hdr=$3; n=0
+  FETCH_CODE=000
+  while [ "$n" -lt 5 ]; do
+    code=$(curl -sS -A "$UA" --max-time 30 -D "$f_hdr" -o "$f_out" -w '%{http_code}' "$f_url" 2>/dev/null) || return 1
+    FETCH_CODE=$code
+    case $code in
+      2*) return 0 ;;
+      301|302|303|307|308)
+        loc=$(sed -n 's/^[Ll]ocation:[ \t]*//p' "$f_hdr" | tr -d '\r\n' | head -n 1)
+        [ -n "$loc" ] || return 1
+        case $loc in
+          /*) host=${f_url#https://}; host=${host%%/*}; loc="https://$host$loc" ;;
+        esac
+        case $loc in
+          "https://x-cmd.com/draw"|"https://x-cmd.com/draw?"*|"https://x-cmd.com/draw/"*|\
+          "https://www.x-cmd.com/draw"|"https://www.x-cmd.com/draw?"*|"https://www.x-cmd.com/draw/"*)
+            f_url=$loc; n=$((n+1)) ;;
+          *) printf '  redirect to non-allowlisted host blocked: %s\n' "$loc" >&2; return 1 ;;
+        esac
+        ;;
+      *) return 1 ;;
+    esac
+  done
+  return 1
+}
 
 if [ "$1" = "-" ]; then
   # shellcheck disable=SC2016
@@ -135,7 +168,7 @@ for url in $urls; do
   # One silent retry shields CI from transient network flakes (5xx/timeouts).
   while [ "$try" -lt 2 ] && [ "$ok" -eq 0 ]; do
     try=$((try+1))
-    if curl -fsSL -A "$UA" --max-time 30 "$url" -o "$tmp" 2>/dev/null; then ok=1; fi
+    if fetch_al "$url" "$tmp" "$hdr"; then ok=1; fi
   done
   if [ "$ok" -eq 1 ]; then
     case $url in
@@ -145,10 +178,10 @@ for url in $urls; do
         if valid_svg "$tmp"; then printf 'PASS %s (svg, %s bytes)\n' "$url" "$(wc -c < "$tmp" | tr -d ' ')"; pass=$((pass+1)); else printf 'FAIL %s\n  response is not SVG\n' "$url"; fail=$((fail+1)); fi ;;
     esac
   else
-    # 4xx bodies carry a plain-text correction example -- surface its first line.
-    code=$(curl -sSL -A "$UA" --max-time 30 -o "$tmp" -w '%{http_code}' "$url" 2>/dev/null)
+    # FETCH_CODE holds the final status from the last attempt; a 4xx body
+    # carries a plain-text correction example -- surface its first line.
     hint=$(head -n 1 "$tmp" 2>/dev/null | cut -c1-160)
-    printf 'FAIL %s\n  HTTP %s %s\n' "$url" "$code" "$hint"
+    printf 'FAIL %s\n  HTTP %s %s\n' "$url" "$FETCH_CODE" "$hint"
     fail=$((fail+1))
   fi
 done
