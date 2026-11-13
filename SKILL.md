@@ -16,10 +16,13 @@ Turn a codebase into render-ready diagram URLs. Every diagram is a single
 browsers, GitHub READMEs, and any Markdown viewer. Default mode writes **no local
 files**; local export happens only on explicit request via `scripts/`.
 
+Renders ≠ true: every node and edge carries source evidence (verified / inferred /
+unknown) — the output is a verifiable asset, not an AI sketch.
+
 ## Step 1 — Intent Analysis & Chart Routing
 
 Pick diagram type(s) from intent + repo shape. Read **only** the matching
-`references/` file before constructing that diagram.
+`references/` file(s) before constructing that diagram.
 
 | User intent | Diagram | Reference |
 |---|---|---|
@@ -33,11 +36,20 @@ Pick diagram type(s) from intent + repo shape. Read **only** the matching
 | Quantitative repo metrics (language split, coverage, growth) | Data charts (`?type=pie|hbar|gauge|combo|...`) | `references/general-charts.md` |
 | Broad "visualize this repo" | **Multi-diagram suite**: 1 `archmap` overview + 1 Sankey (data/dependency flow) or `seq` (core request flow) | the two matching references |
 
-Other node/edge endpoints with the same grammar as `archmap` (see
-`references/architecture.md`): `arch2` (alt architecture skin), `uc` (use case:
-`actor`/`uc`), `dataflow` (`process`/`store`/`source`/`sink`), `erd` (`table`/`view`),
-`class` (`class`/`iface`/`enum`). Long-tail charts (treemap, funnel, graph, ...):
-`/draw/echarts?d=<url-encoded echarts option JSON>`.
+Same-grammar siblings of `archmap` (see `references/architecture.md`): `arch2`,
+`uc` (`actor`/`uc`), `dataflow` (`process`/`store`/`source`/`sink`), `erd`
+(`table`/`view`), `class` (`class`/`iface`/`enum`). Long-tail charts (treemap,
+funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
+
+**Scan modes** — scope the scan before reading code (user may pick; default from intent):
+
+| Mode | Scope | Typical output |
+|---|---|---|
+| `quick` | manifests, tree to depth 2, entry points | 1 overview diagram |
+| `architecture` | modules, services, dependency graph | `archmap` (+ Sankey by weight) |
+| `deep-dive` | call chains, data flow, state machines | `seq` / flowchart / Sankey suite |
+| `impact` | `git diff` vs base: changed files and their dependents | change-flow diagram |
+| `full` | all of the above | Repository Report (suite + quality report) |
 
 ## Step 2 — Token-Disciplined Codebase Scanning
 
@@ -51,13 +63,22 @@ Other node/edge endpoints with the same grammar as `archmap` (see
 4. **URL length guardrail**: keep one diagram to ~15–20 nodes (~60 links for Sankey)
    so URLs stay readable and inside CDN limits. For large repos, emit a high-level
    overview diagram + one diagram per subsystem, never a single dense mega-diagram.
+5. Detect language and stack from the manifests and scan with that lens: Go →
+   packages, interfaces, goroutines; TypeScript → modules, import graph, API routes;
+   Rust → crates, traits, features; Python → packages, decorators, entry points.
+6. Record evidence as you scan: every node/edge gets `file[:symbol[:lines]]` and a
+   level — **verified** (seen in the code), **inferred** (derived from structure), or
+   **unknown** (pattern assumption). Never mark verified without opening the file.
 
 ## Step 3 — Construct the URL
 
+- Build the lightweight Repository IR first for suites (one shared node inventory,
+  one document per diagram); map IR → URL only at encode time. Schema, evidence
+  levels, and validation protocol: `references/repository-ir.md`.
 - Grammar (nodes/edges/boundaries), encoding table, worked examples, and per-type
   limits live in the reference files. Follow them exactly; every example there is
   live-tested.
-- Encoding essentials: space `%20`, `+` `%2B`, `&` `%26`, `#` `%23`, `<`/`>` `%3C`/`%3E`,
+- Encoding essentials: space `%20`, `+` `%2B`, `&` `%26`, `#` `%23`, `<`/`>` `%3C`/%3E`,
   newline `%0A`; separators `;` `=` `,` `:` `/` `@` stay literal. No Base64.
 - Common modifiers: `title=`, `scheme=dark|light`, `t=<style>` (per-type families in
   references — arch2/seq look best with `t=shadcn`; arch2 nodes take an optional 6th
@@ -81,9 +102,23 @@ Other node/edge endpoints with the same grammar as `archmap` (see
 - <bullet: notable coupling / single points of failure / ownership boundaries>
 ```
 
-- `<explore-url>` rewrites the render URL for interactive editing: path
-  `/draw?type=X&q` → `/draw/explore?type=X&q`; `/draw/<name>?q` → `/draw/explore/<name>?q`.
+- `<explore-url>` rewrites `/draw?type=X&q` → `/draw/explore?type=X&q` and
+  `/draw/<name>?q` → `/draw/explore/<name>?q` — draw's built-in interactive editor;
+  link it, don't rebuild it.
 - 2–5 tight bullets per diagram. The image is the deliverable; bullets add judgment.
+
+Close a suite with the quality report (real counts only — never fabricate):
+
+```text
+Repository Analysis — <repo> (<scan_mode>, <commit>)
+Files inspected: N | Modules: N | Relationships: N
+Evidence: verified N · inferred N · unknown N
+Validation: L1 pass · L2 pass · L3: N unresolved (flagged below)
+```
+
+Flag every `unknown` under its diagram. For explicit "validate" requests or
+pre-export checks: `bash scripts/validate.sh <urls...>` (L1 render) and `bash
+scripts/validate.sh --ir <ir.json>` (L2 structure). L3 is your re-read of cited files.
 
 **Export mode — only when the user explicitly says** "save locally", "download
 SVG/PNG", "export image", or "generate HTML report":
@@ -111,3 +146,6 @@ bash scripts/build_html.sh "<title>" "<out.html>" '<json>'  # standalone report
   re-reading the repo per diagram.
 - Prefer fewer, well-chosen nodes over completeness; collapse details into `sub`
   captions and boundary boxes.
+- Evidence or it didn't happen: every node/edge is verified, inferred, or flagged
+  unknown — never fabricated. Keep the IR/renderer split so suites, reports, and
+  future architecture diffs share one inventory; rendering stays a replaceable adapter.
