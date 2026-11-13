@@ -7,6 +7,12 @@ description: >
   with on-demand export to local SVG, PNG, or standalone interactive HTML reports.
   Use when the user asks to visualize a repo, map architecture, trace data flows,
   draw a flowchart/Sankey/sequence diagram, or document system design.
+metadata:
+  permissions: >
+    Network: fetches rendered diagrams from x-cmd.com via explicit, agent-built URLs
+    (render, validate, or explicit export only). Filesystem: writes only when the user
+    explicitly asks to save/export. No package downloads, no installs, no background
+    processes, no credential access.
 ---
 
 # repoviz
@@ -64,8 +70,8 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
    so URLs stay readable and inside CDN limits. For large repos, emit a high-level
    overview diagram + one diagram per subsystem, never a single dense mega-diagram.
 5. Detect language and stack from the manifests and scan with that lens: Go →
-   packages, interfaces, goroutines; TypeScript → modules, import graph, API routes;
-   Rust → crates, traits, features; Python → packages, decorators, entry points.
+   packages/interfaces/goroutines; TypeScript → modules/import graph/API routes; Rust
+   → crates/traits/features; Python → packages/decorators/entry points.
 6. Record evidence as you scan: every node/edge gets `file[:symbol[:lines]]` and a
    level — **verified** (seen in the code), **inferred** (derived from structure), or
    **unknown** (pattern assumption). Never mark verified without opening the file.
@@ -73,8 +79,8 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
 ## Step 3 — Construct the URL
 
 - Build the lightweight Repository IR first for suites (one shared node inventory,
-  one document per diagram); map IR → URL only at encode time. Schema, evidence
-  levels, and validation protocol: `references/repository-ir.md`.
+  one document per diagram); map IR → URL at encode time. Schema and validation
+  protocol: `references/repository-ir.md`.
 - Grammar (nodes/edges/boundaries), encoding table, worked examples, and per-type
   limits live in the reference files. Follow them exactly; every example there is
   live-tested.
@@ -106,6 +112,11 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
   `/draw/<name>?q` → `/draw/explore/<name>?q` — draw's built-in interactive editor;
   link it, don't rebuild it.
 - 2–5 tight bullets per diagram. The image is the deliverable; bullets add judgment.
+- **Confidentiality**: rendering sends diagram labels to the x-cmd.com renderer as
+  URL parameters (they can surface in server access logs; percent-encoding is not
+  encryption), and Markdown image embeds may be auto-fetched by clients or proxies.
+  For confidential repos, warn the user and get explicit approval before rendering —
+  or deliver local exports instead.
 
 Close a suite with the quality report (real counts only — never fabricate):
 
@@ -128,12 +139,12 @@ bash scripts/export.sh "<draw-url>" "<out.svg|png>"   # downloads rendered file
 bash scripts/build_html.sh "<title>" "<out.html>" '<json>'  # standalone report
 ```
 
-- `export.sh` appends `format=png` automatically for `.png` targets (add `&scale=2`
-  or `3` to the URL for higher resolution; pass `scheme=dark` explicitly for PNG,
-  whose scheme defaults to light).
+- `export.sh` downloads via `curl` (fallback: CLIs already installed locally — it
+  never fetches or installs packages); `.png` targets auto-get `&format=png` (add
+  `&scale=2|3` for higher resolution; pass `scheme=dark` — PNG defaults to light).
 - `build_html.sh` takes a JSON array of `{"title","url","note"}` objects and emits a
-  self-contained dark/light responsive report with sidebar nav, zoom, fullscreen, and
-  copy-URL buttons. Example payload:
+  self-contained dark/light responsive report (sidebar nav, zoom, fullscreen,
+  copy-URL buttons); all values are HTML-escaped. Example payload:
   `[{"title":"Architecture","url":"https://x-cmd.com/draw/archmap?...","note":"3 tiers; gateway is the single entry"}]`
 - After exporting, print the saved path(s) and continue to output the Markdown block
   for the chat so the user gets both.

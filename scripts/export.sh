@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 # repoviz export.sh — download a rendered diagram (SVG/PNG) from a draw URL.
 # Usage: sh scripts/export.sh "<draw_url>" "<output.svg|png>"
+# Security: curl-only download of the explicit URL. Optional fallbacks invoke
+# *locally installed* CLIs (x / x-cmd / draw). No package is ever fetched,
+# installed, or executed from a registry.
 set -u
 
 PROG=${0##*/}
@@ -64,7 +67,8 @@ if have curl; then
   fi
 fi
 
-# Fallbacks: a local draw CLI (x-cmd / npm @x-cmd/draw). Best effort, never required.
+# Fallbacks: locally installed draw CLIs only (x-cmd / npm draw already on PATH).
+# Best effort, never required; nothing here downloads or installs software.
 if [ -n "$q" ]; then
   if have x && x draw "$q" >"$tmp" 2>/dev/null && valid_file "$tmp"; then
     mv "$tmp" "$out"
@@ -87,21 +91,6 @@ if [ -n "$q" ]; then
       if draw "$q" >"$tmp" 2>/dev/null && valid_file "$tmp"; then
         mv "$tmp" "$out"
         printf 'saved: %s (%s bytes, via draw)\n' "$out" "$(wc -c < "$out" | tr -d ' ')"
-        exit 0
-      fi
-    fi
-  fi
-  if have npx; then
-    if [ "$fmt" = png ]; then
-      if npx --yes @x-cmd/draw "$q" --out "$tmp" >/dev/null 2>&1 && valid_file "$tmp"; then
-        mv "$tmp" "$out"
-        printf 'saved: %s (%s bytes, via npx @x-cmd/draw)\n' "$out" "$(wc -c < "$out" | tr -d ' ')"
-        exit 0
-      fi
-    else
-      if npx --yes @x-cmd/draw "$q" >"$tmp" 2>/dev/null && valid_file "$tmp"; then
-        mv "$tmp" "$out"
-        printf 'saved: %s (%s bytes, via npx @x-cmd/draw)\n' "$out" "$(wc -c < "$out" | tr -d ' ')"
         exit 0
       fi
     fi

@@ -5,6 +5,8 @@
 #   sh scripts/validate.sh -                          # L1: read URLs from stdin, one per line
 #   sh scripts/validate.sh --ir <file.json>           # L2: node/edge/evidence structure
 # Exit 0 = all checks pass, 1 = a check failed, 2 = usage error.
+# Security: read-only checks. Uses the locally installed python3 (if present) to
+# parse IR JSON — nothing is downloaded, installed, or executed from a registry.
 set -u
 
 PROG=${0##*/}

@@ -125,6 +125,19 @@ Under the hood the agent picks the right chart type (routing table in
 flat percent-encoded render URLs — plus, only on request, runs
 `scripts/export.sh` or `scripts/build_html.sh`.
 
+## Privacy & security
+
+- **Rendering transmits labels, not files.** A diagram URL carries node/edge labels
+  to the x-cmd.com renderer so it can draw the image; treat those labels like any
+  outbound URL (they may appear in server access logs). Percent-encoding is not
+  encryption — don't put secrets, credentials, or sensitive internal names in labels.
+- **No uploads, no installs.** Default mode writes zero local files. The export
+  scripts only download the rendered file with `curl`, with optional fallbacks to
+  CLIs already installed on your machine — nothing is ever fetched from a package
+  registry or executed beyond that.
+- For confidential codebases, prefer local SVG/PNG export, and think twice before
+  embedding diagram URLs in public READMEs (image proxies fetch them automatically).
+
 ## Repository layout
 
 ```text

@@ -3,6 +3,8 @@
 # Usage: sh scripts/build_html.sh "<title>" "<output.html>" '<json>'
 #   json = [{"title":"...","url":"https://x-cmd.com/draw/...","note":"..."}, ...]
 # Value restrictions: no double quotes, no "}", no tabs/newlines inside values.
+# Security: every JSON-derived value is HTML-escaped (esc) before output; the
+# report is static HTML/JS with no eval and no network calls of its own.
 set -u
 
 PROG=${0##*/}
