@@ -33,6 +33,16 @@ b=label;id id ...                # boundary box around existing node ids
 
 **Common modifiers:** `title=` diagram title · `scheme=dark|light` · `t=evil` (alternate style family) · `w=` 200–1600 / `h=` 140–1200.
 
+**arch2 extras — icons & skins:** `/draw/arch2` (the prettier architecture sibling of `archmap`) accepts an optional **6th field on `n=` — a tech icon**, and shines with `t=shadcn`:
+
+```
+n=api;be;API service;ECS Fargate;r2c0;aws:ecs
+```
+
+Icons use `namespace:name` tokens; confirmed namespaces include `aws:*` (e.g. `aws:ecs`, `aws:rds`, `aws:lambda`, `aws:s3`, `aws:sqs`, `aws:dynamodb`, `aws:redis`, `aws:alb`, `aws:cloudfront`, `aws:cloudwatch`, `aws:route53`, `aws:opensearch`, `aws:apigw`, `aws:iam`, `aws:igw`, `aws:nlb`, `aws:eks`, `aws:codebuild`, `aws:codepipeline`, `aws:codedeploy`, `aws:ecr`) and `org:*` (registries/organizations). Unknown icons are ignored silently — the node still renders, so icon fields are safe to sprinkle in. Grid positions, spans, and boundaries work exactly as in `archmap`; both endpoints share the same `n=`/`e=`/`b=` grammar.
+
+**CJK note for PNG export:** the rasterizer embeds a subsetted Noto Sans SC (GB2312 level-1 only). Rare characters outside the subset (e.g. `渲`) render as tofu in **PNG** output. SVG output is unaffected. Prefer common synonyms in Chinese PNG labels (`渲染` → `生成`).
+
 ## Minimal Working Example (5 nodes)
 
 Raw definition (readable form):

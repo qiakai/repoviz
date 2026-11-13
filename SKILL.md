@@ -60,7 +60,11 @@ Other node/edge endpoints with the same grammar as `archmap` (see
 - Encoding essentials: space `%20`, `+` `%2B`, `&` `%26`, `#` `%23`, `<`/`>` `%3C`/`%3E`,
   newline `%0A`; separators `;` `=` `,` `:` `/` `@` stay literal. No Base64.
 - Common modifiers: `title=`, `scheme=dark|light`, `t=<style>` (per-type families in
-  references), `w=`/`h=`, `v=N` to pin a cached version, `num=all|peak|none` (charts).
+  references — arch2/seq look best with `t=shadcn`; arch2 nodes take an optional 6th
+  `icon` field, e.g. `n=api;be;API;ECS;r2c0;aws:ecs`), `w=`/`h=`, `v=N` to pin a cached
+  version, `num=all|peak|none` (charts).
+- PNG output embeds a GB2312 level-1 CJK subset: rare characters (e.g. `渲`) become
+  tofu in PNG. SVG has no such limit — prefer common synonyms for Chinese PNG labels.
 - On a 4xx, the response body is plain text with a correction example — read it,
   fix the offending parameter, retry. Never guess twice.
 

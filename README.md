@@ -21,19 +21,11 @@ visualization — an **architecture map**, **Sankey flow**, **flowchart**,
 embeddable URL. No local installs, no file writes by default; every diagram is a
 Markdown image link you can paste into a README, doc, or chat.
 
-**Live showcase** — these render right now, from real URLs (a sample web service and its data pipeline):
+**Live showcase** — these render right now, from real URLs (a production AWS platform, and where its budget goes):
 
-![repoviz architecture sample](https://x-cmd.com/draw/archmap?title=Sample%20web%20service&n=user;ext;User;;r0c0&n=cdn;cloud;CDN;;r0c1&n=gw;be;API%20Gateway;rate%20limit;r0c2&n=auth;sec;Auth;JWT;r1c1&n=svc;be;Core%20Service;logic;r1c2&n=pg;db;Postgres;;r2c1&n=redis;db;Redis;cache;r2c2&e=user;cdn;https&e=cdn;gw&e=gw;auth;verify;main&e=gw;svc;route;main&e=auth;svc;claims&e=svc;pg;sql;main&e=svc;redis;cache&b=Data%20Layer;pg%20redis)
+![repoviz architecture sample](https://x-cmd.com/draw/arch2?t=shadcn&title=Production%20web%20platform%20on%20AWS&n=r53;cloud;Route%2053;DNS;r0c0;aws:route53&n=waf;sec;WAF;rules;r0c1&n=cf;cloud;CloudFront;CDN;r0c2;aws:cloudfront&n=s3;db;S3;static%20assets;r0c3;aws:s3&n=igw;cloud;Internet%20Gateway;public%20ingress;r1c3;aws:igw&n=alb;cloud;ALB;HTTPS%20443;r1c2;aws:alb&n=api;be;API%20service;ECS%20Fargate;r2c0;aws:ecs&n=lam;be;Lambda;async%20jobs;r2c1;aws:lambda&n=sqs;bus;SQS;queue;r2c2;aws:sqs&n=auth;sec;Cognito;OIDC;r2c3&n=rds;db;RDS;PostgreSQL;r3c0;aws:rds&n=redis;db;ElastiCache;session%20cache;r3c1;aws:redis&n=ddb;db;DynamoDB;items;r3c2;aws:dynamodb&n=os;db;OpenSearch;index;r3c3;aws:opensearch&n=cw;be;CloudWatch;metrics%20%26%20alerts;r4c1;aws:cloudwatch&n=sns;bus;SNS;notifications;r4c2&e=r53;cf;resolve&e=waf;cf;filter&e=cf;alb;forward;main&e=cf;s3;static&e=igw;alb;public&e=alb;api;route;main&e=api;auth;verify&e=api;rds;query;main&e=api;ddb;read%20%26%20write;main&e=api;redis;cache&e=api;lam;enqueue&e=lam;sqs;consume&e=sqs;sns;notify&e=lam;os;index&e=api;cw;OTLP&e=lam;cw;logs&b=Edge;r53%20waf%20cf%20s3%20igw%20alb&b=Compute;api%20lam%20auth&b=Data;rds%20redis%20ddb%20os%20sqs%20sns%20cw)
 
-![repoviz sankey sample](https://x-cmd.com/draw?type=sankey&t=pipeline&labels=Events,Collector,Stream,Hot%20Store,Cold%20Store,Dashboard,ML%20Pipeline&links=Events>Collector:100;Collector>Stream:96;Stream>Hot%20Store:40;Stream>Cold%20Store:56;Hot%20Store>Dashboard:32;Hot%20Store>ML%20Pipeline:8;Cold%20Store>ML%20Pipeline:30;Cold%20Store>Dashboard:12&title=Data%20pipeline%20flow&unit=GB%2Fday)
-
-### A real-world architecture, rendered from one URL
-
-An 18-node SaaS platform — clients, edge, six services, four data backends, external
-providers — grouped into four boundaries. Every box, label, and edge below is data in
-the URL; edit any segment and the diagram re-renders:
-
-![repoviz real-world architecture sample](https://x-cmd.com/draw/archmap?title=SaaS%20platform%20architecture&n=web;fe;Web%20App;React;;r0c0&n=app;fe;Mobile%20App;Flutter;;r0c1&n=open;ext;Open%20API;partners;;r0c2&n=cdn;cloud;CDN;edge%20cache;;r0c3&n=gw;be;API%20Gateway;rate%20limit;;r1c0&n=auth;sec;Auth%20Service;JWT%20%C2%B7%20OIDC;;r1c1&n=order;be;Order%20Service;;r1c2&n=pay;be;Payment%20Service;;r1c3&n=notify;svc;Notification%20Service;;r2c0&n=search;be;Search%20Service;;r2c1&n=rec;be;Recommend%20Service;;r2c2&n=pg1;db;Users%20DB;Postgres;;r2c3&n=pg2;db;Orders%20DB;Postgres;;r3c0&n=redis;db;Redis;cache%20%C2%B7%20queue;;r3c1&n=kafka;bus;Kafka;event%20stream;;r3c2&n=oss;cloud;Object%20Storage;S3;;r3c3&n=stripe;ext;Stripe;payments;;r4c0&n=sms;ext;SMS%20Provider;;r4c1&e=web;cdn&e=app;cdn&e=open;gw&e=cdn;gw;route&e=gw;auth;verify;main&e=gw;order;main&e=gw;search&e=gw;rec&e=auth;pg1;users&e=auth;redis;session&e=order;pg2;SQL;main&e=order;redis;cache&e=order;kafka;OrderCreated&e=kafka;notify;subscribe&e=kafka;search;index&e=order;pay;charge;main&e=pay;stripe;API;main&e=order;oss;files&e=notify;sms;SMS&e=rec;redis&b=Clients;web%20app%20open%20cdn&b=Services;gw%20auth%20order%20pay%20notify%20search%20rec&b=Data;pg1%20pg2%20redis%20kafka%20oss&b=External;stripe%20sms)
+![repoviz sankey sample](https://x-cmd.com/draw?type=sankey&t=fund&labels=Budget,Compute,Storage,Network,Data,Prod,ML,Analytics,Other&links=Budget>Compute:42;Budget>Storage:18;Budget>Network:14;Budget>Data:26;Compute>Prod:30;Compute>ML:12;Storage>Prod:8;Storage>Other:10;Network>Other:14;Data>Analytics:17;Data>ML:9&title=Monthly%20cloud%20spend&unit=%241k&w=880&h=540)
 
 ## Why repoviz?
 
@@ -51,19 +43,19 @@ Copy a prompt, drop it in your agent (with repoviz installed), and it scans + ro
 
 **1. System architecture** — *"Visualize this repo's architecture."*
 
-![Architecture gallery](https://x-cmd.com/draw/archmap?title=Sample%20web%20service&n=user;ext;User;;r0c0&n=cdn;cloud;CDN;;r0c1&n=gw;be;API%20Gateway;rate%20limit;r0c2&n=auth;sec;Auth;JWT;r1c1&n=svc;be;Core%20Service;logic;r1c2&n=pg;db;Postgres;;r2c1&n=redis;db;Redis;cache;r2c2&e=user;cdn;https&e=cdn;gw&e=gw;auth;verify;main&e=gw;svc;route;main&e=auth;svc;claims&e=svc;pg;sql;main&e=svc;redis;cache&b=Data%20Layer;pg%20redis)
+![Architecture gallery](https://x-cmd.com/draw/arch2?t=shadcn&title=Production%20web%20platform%20on%20AWS&n=r53;cloud;Route%2053;DNS;r0c0;aws:route53&n=waf;sec;WAF;rules;r0c1&n=cf;cloud;CloudFront;CDN;r0c2;aws:cloudfront&n=s3;db;S3;static%20assets;r0c3;aws:s3&n=igw;cloud;Internet%20Gateway;public%20ingress;r1c3;aws:igw&n=alb;cloud;ALB;HTTPS%20443;r1c2;aws:alb&n=api;be;API%20service;ECS%20Fargate;r2c0;aws:ecs&n=lam;be;Lambda;async%20jobs;r2c1;aws:lambda&n=sqs;bus;SQS;queue;r2c2;aws:sqs&n=auth;sec;Cognito;OIDC;r2c3&n=rds;db;RDS;PostgreSQL;r3c0;aws:rds&n=redis;db;ElastiCache;session%20cache;r3c1;aws:redis&n=ddb;db;DynamoDB;items;r3c2;aws:dynamodb&n=os;db;OpenSearch;index;r3c3;aws:opensearch&n=cw;be;CloudWatch;metrics%20%26%20alerts;r4c1;aws:cloudwatch&n=sns;bus;SNS;notifications;r4c2&e=r53;cf;resolve&e=waf;cf;filter&e=cf;alb;forward;main&e=cf;s3;static&e=igw;alb;public&e=alb;api;route;main&e=api;auth;verify&e=api;rds;query;main&e=api;ddb;read%20%26%20write;main&e=api;redis;cache&e=api;lam;enqueue&e=lam;sqs;consume&e=sqs;sns;notify&e=lam;os;index&e=api;cw;OTLP&e=lam;cw;logs&b=Edge;r53%20waf%20cf%20s3%20igw%20alb&b=Compute;api%20lam%20auth&b=Data;rds%20redis%20ddb%20os%20sqs%20sns%20cw)
 
-**2. Data & dependency flow (Sankey)** — *"Trace how data flows through this pipeline."*
+**2. Data & dependency flow (Sankey)** — *"Show me where last month's cloud budget went."*
 
-![Sankey gallery](https://x-cmd.com/draw?type=sankey&t=pipeline&labels=Events,Collector,Stream,Hot%20Store,Cold%20Store,Dashboard,ML%20Pipeline&links=Events>Collector:100;Collector>Stream:96;Stream>Hot%20Store:40;Stream>Cold%20Store:56;Hot%20Store>Dashboard:32;Hot%20Store>ML%20Pipeline:8;Cold%20Store>ML%20Pipeline:30;Cold%20Store>Dashboard:12&title=Data%20pipeline%20flow&unit=GB%2Fday)
+![Sankey gallery](https://x-cmd.com/draw?type=sankey&t=fund&labels=Budget,Compute,Storage,Network,Data,Prod,ML,Analytics,Other&links=Budget>Compute:42;Budget>Storage:18;Budget>Network:14;Budget>Data:26;Compute>Prod:30;Compute>ML:12;Storage>Prod:8;Storage>Other:10;Network>Other:14;Data>Analytics:17;Data>ML:9&title=Monthly%20cloud%20spend&unit=%241k&w=880&h=540)
 
-**3. Request / execution flowchart** — *"Draw the auth flow as a flowchart."*
+**3. Execution flow (agent loop)** — *"Walk me through how repoviz handles one request, end to end."*
 
-![Flowchart gallery](https://x-cmd.com/draw/mermaid?m=graph%20TD%3B%20U%5BLogin%5D--%3EV%7Bvalid%20token%3F%7D%3B%20V--%3EG%5BGrant%20access%5D%3B%20V--%3ED%5BDeny%5D&title=Auth%20flow)
+![Flowchart gallery](https://x-cmd.com/draw/arch2?t=shadcn&title=One%20repoviz%20request%2C%20end%20to%20end&n=input;fe;User%20request;repo%20%26%20intent;r0c0&n=scan;be;Repo%20scan;manifests%20%26%20entries;r0c1&n=route;be;Chart%20routing;references%2F%2A.md;r0c2&n=build;svc;Build%20URL;encode%20nodes%20%26%20edges;r0c3&n=guard;sec;Guardrails;URL%20length%20%26%20escaping;r1c3&n=render;svc;Render;SVG%20via%20URL;r1c2&n=export;svc;Export;SVG%20%C2%B7%20PNG%20%C2%B7%20HTML;r1c1&n=final;fe;Answer;diagram%20%2B%20link%20%2B%20notes;r1c0&n=refs;db;Syntax%20refs;references%2F%2A.md;r2c1&n=notes;svc;Insights;bullets%20per%20diagram;r2c2&e=input;scan&e=scan;route&e=route;build&e=build;guard&e=guard;render&e=render;export&e=export;final&e=route;refs;lazy-load&e=refs;build;grammar&e=render;notes&e=notes;final&e=final;input;feedback%3Bdash&b=Agent%20loop;input%20scan%20route%20build%20guard%20render%20export%20final&b=Knowledge;refs%20notes)
 
 **4. Sequence diagram** — *"Show the API handshake sequence for creating an order."*
 
-![Sequence gallery](https://x-cmd.com/draw/seq?title=API%20handshake&n=c;fe;Client&n=g;be;API%20Gateway&n=a;sec;Auth&n=s;be;Service&e=c;g;POST%20%2Forders&e=g;a;verify%20token&e=a;g;claims;dash&e=g;s;forward&e=s;g;201%20Created;dash)
+![Sequence gallery](https://x-cmd.com/draw/seq?t=shadcn&title=API%20handshake&n=c;fe;Client;&n=g;be;API%20Gateway;&n=a;sec;Auth;&n=s;be;Service;&e=c;g;POST%20%2Forders&e=g;a;verify%20token&e=a;g;claims;dash&e=g;s;forward&e=s;g;201%20Created;dash)
 
 ## Quick installation
 
