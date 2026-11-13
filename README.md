@@ -56,6 +56,7 @@ Copy a prompt, drop it in your agent (with repoviz installed), and it scans + ro
 **4. Sequence diagram** — *"Show the API handshake sequence for creating an order."*
 
 ![Sequence gallery](https://x-cmd.com/draw/seq?t=shadcn&title=API%20handshake&n=c;fe;Client;&n=g;be;API%20Gateway;&n=a;sec;Auth;&n=s;be;Service;&e=c;g;POST%20%2Forders&e=g;a;verify%20token&e=a;g;claims;dash&e=g;s;forward&e=s;g;201%20Created;dash)
+
 **5. ERD (database schema)** — *"Document this project's database schema as an ERD."*
 
 ![ERD gallery](https://x-cmd.com/draw/erd?title=Multi-tenant%20SaaS%20schema&n=tenants;table;tenants;id%3Auuid%20%28pk%29%0Aslug%3Atext%20%28uk%29%0Aplan%3Atext%0Acreated_at%3Atimestamp;r0c0&n=users;table;users;id%3Auuid%20%28pk%29%0Aemail%3Atext%20%28uk%29%0Acreated_at%3Atimestamp;r0c2&n=memberships;table;memberships;tenant_id%3Auuid%20%28fk%29%0Auser_id%3Auuid%20%28fk%29%0Arole%3Atext%0Ajoined_at%3Atimestamp;r1c1&n=projects;table;projects;id%3Auuid%20%28pk%29%0Atenant_id%3Auuid%20%28fk%29%0Aname%3Atext%0Aarchived_at%3Atimestamp;r2c0&n=tasks;table;tasks;id%3Auuid%20%28pk%29%0Aproject_id%3Auuid%20%28fk%29%0Aassignee_id%3Auuid%20%28fk%29%0Atitle%3Atext%0Astatus%3Atext%0Adue_at%3Atimestamp;r2c2&n=comments;table;comments;id%3Auuid%20%28pk%29%0Atask_id%3Auuid%20%28fk%29%0Aauthor_id%3Auuid%20%28fk%29%0Abody%3Atext%0Acreated_at%3Atimestamp;r3c1&e=tenants;memberships;1%3AN&e=users;memberships;1%3AN&e=tenants;projects;1%3AN&e=projects;tasks;1%3AN&e=users;tasks;1%3AN&e=tasks;comments;1%3AN&e=users;comments;1%3AN)
@@ -67,6 +68,8 @@ Copy a prompt, drop it in your agent (with repoviz installed), and it scans + ro
 **7. Mind map (feature tree)** — *"Lay out repoviz's feature tree as a mind map."*
 
 ![Mindmap gallery](https://x-cmd.com/draw/mindmap?style=tree&title=repoviz%20feature%20map&n=repoviz%2FCharts%2FArchitecture&n=repoviz%2FCharts%2FSequence&n=repoviz%2FCharts%2FSankey&n=repoviz%2FCharts%2FFlowchart&n=repoviz%2FCharts%2FMindmap&n=repoviz%2FCharts%2FGantt&n=repoviz%2FExport%2FSVG&n=repoviz%2FExport%2FPNG&n=repoviz%2FExport%2FHTML%20report&n=repoviz%2FOutput%2FMarkdown%20links)
+
+> More chart types (class, dataflow, lifecycle, use-case, radar, butterfly, quadrant, calendar, QR, and the full metric-chart set) live in [`references/`](references/) and in the [gallery issue](https://github.com/qiakai/repoviz/issues/1) — every URL is live-tested.
 
 
 ## Quick installation
