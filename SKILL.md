@@ -56,6 +56,9 @@ funnel, graph, ...): `/draw/echarts?d=<url-encoded echarts option JSON>`.
 | `impact` | `git diff` vs base: changed files and their dependents | change-flow diagram |
 | `full` | all of the above | Repository Report (suite + quality report) |
 
+`impact` mode loads `references/architecture-diff.md` (git-diff delta workflow);
+multi-diagram or evidence-sensitive work loads `references/repository-ir.md`.
+
 ## Step 2 — Token-Disciplined Codebase Scanning
 
 1. Read root manifests first: `package.json`, `go.mod`, `Cargo.toml`,
@@ -136,23 +139,38 @@ pre-export checks: `bash scripts/validate.sh <urls...>` (L1 render) and `bash
 scripts/validate.sh --ir <ir.json>` (L2 structure). L3 is your re-read of cited files.
 
 **Export mode — only when the user explicitly says** "save locally", "download
-SVG/PNG", "export image", or "generate HTML report":
+SVG/PNG", "export image", "short link", "put this in my README", or "generate
+HTML report":
 
 ```sh
-bash scripts/export.sh "<draw-url>" "<out.svg|png>"   # downloads rendered file
-bash scripts/build_html.sh "<title>" "<out.html>" '<json>'  # standalone report
+bash scripts/export.sh "<draw-url>" "<out.svg|png>"        # single download
+bash scripts/export.sh --batch <manifest.tsv>              # many: "<url>\t<out>" per line, # comments
+bash scripts/shorten.sh <type> '<d-schema json>' [title]   # permanent /draw/c/<hash> (?type= charts only)
+bash scripts/build_html.sh "<title>" "<out.html>" '<json>' # standalone report (+ optional ev evidence)
+bash scripts/inject_readme.sh "<README.md>" '<json>'       # insert/update diagrams between repoviz markers
 ```
 
 - `export.sh` downloads via `curl` (fallback: CLIs already installed locally — it
   never fetches or installs packages); `.png` targets auto-get `&format=png` (add
   `&scale=2|3` for higher resolution; pass `scheme=dark` — PNG defaults to light).
-- `build_html.sh` takes a JSON array of `{"title","url","note"}` objects (`url`
-  restricted to `*/draw*` render URLs) and emits a self-contained dark/light
-  responsive report (sidebar nav, zoom, fullscreen, copy-URL buttons); all values are
+  Batch mode: one `url<TAB>output` per line, `#` comments allowed; exits non-zero
+  if any item fails.
+- `shorten.sh` POSTs the chart definition (the `?d=` JSON schema) to x-cmd.com —
+  rate limit ~30/min/IP. Only the `?type=` family accepts POST; node/edge diagrams
+  (`/draw/archmap`, `/draw/seq`, ...) return 405 — keep their full URLs. The
+  returned `/draw/c/<hash>` renders with GET and is permanent.
+- `build_html.sh` takes a JSON array of `{"title","url","note"[,"ev"]}` objects
+  (`url` restricted to `*/draw*` render URLs; `ev` optional, encoded
+  `"node|file|symbol|lines|level;..."` — renders a filterable Source-evidence
+  table) and emits a self-contained dark/light responsive report: sidebar nav,
+  zoom, fullscreen, copy-URL buttons, print-to-PDF friendly. All values are
   HTML-escaped. Example payload:
-  `[{"title":"Architecture","url":"https://x-cmd.com/draw/archmap?...","note":"3 tiers; gateway is the single entry"}]`
-- After exporting, print the saved path(s) and continue to output the Markdown block
-  for the chat so the user gets both.
+  `[{"title":"Architecture","url":"https://x-cmd.com/draw/archmap?...","note":"3 tiers; gateway is the single entry","ev":"api|src/api.ts|createServer|12-40|verified"}]`
+- `inject_readme.sh` is idempotent: appends a `<!-- repoviz:start -->` …
+  `<!-- repoviz:end -->` block (Markdown image + note per diagram) on first use,
+  replaces it in place on later runs — diagrams become living assets in the repo.
+- After exporting, print the saved path(s) and continue to output the Markdown
+  block for the chat so the user gets both.
 
 ## Rules
 

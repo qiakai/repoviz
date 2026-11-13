@@ -1,0 +1,48 @@
+name: URL health
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * 1" # Mondays 03:23 UTC
+  push:
+    paths:
+      - "README.md"
+      - "README.zh.md"
+      - "references/**"
+      - ".github/workflows/url-health.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract render URLs (skip templates)
+        run: |
+          grep -ohE 'https://x-cmd\.com/draw[^ )"'"'"'`]+' README.md README.zh.md references/*.md \
+            | grep -v '[<>]' \
+            | grep -vE '%0A$' \
+            | sed 's/[.,;:]*$//' \
+            | sort -u > /tmp/draw-urls.txt
+          echo "validating $(wc -l < /tmp/draw-urls.txt) unique render URLs"
+
+      - name: Validate every render URL (SVG/PNG reachable)
+        run: sh scripts/validate.sh - < /tmp/draw-urls.txt
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "URL health check failed (${{ github.run_id }})" \
+            --body "Scheduled render-URL validation found failing links.
+
+          Failing run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Reproduce locally: \`grep -ohE 'https://x-cmd\\.com/draw[^ )\"'\"'\"'\`]+' README.md README.zh.md references/*.md | grep -v '[<>]' | grep -vE '%0A$' | sort -u > /tmp/urls.txt && sh scripts/validate.sh - < /tmp/urls.txt\`" \
+            || true

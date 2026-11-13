@@ -120,10 +120,33 @@ Scan this repo and generate a standalone HTML report with the architecture,
 data-flow Sankey, and your notes — dark mode aware, for sharing with the team.
 ```
 
+**PR / change impact (delta diagram):**
+
+```
+What does this PR change architecturally? Base is main. Show the blast radius
+as a delta diagram plus a +/- summary for the review.
+```
+
+**Embed diagrams into the README (in place):**
+
+```
+Visualize the architecture and put the diagrams straight into my README.md —
+keep that block updatable on future runs.
+```
+
+**Short links & batch export:**
+
+```
+Save the Sankey as a 2x PNG and the architecture as an SVG in ./assets, and
+give me a permanent short link for the Sankey — the URL is getting huge.
+```
+
 Under the hood the agent picks the right chart type (routing table in
 `SKILL.md`), scans manifests and entry points with a token budget, and emits
 flat percent-encoded render URLs — plus, only on request, runs
-`scripts/export.sh` or `scripts/build_html.sh`.
+`scripts/export.sh` (single or `--batch`), `scripts/shorten.sh`,
+`scripts/build_html.sh` (with filterable source-evidence tables and PDF-friendly
+printing), `scripts/inject_readme.sh`, or `scripts/validate.sh`.
 
 ## Privacy & security
 
@@ -152,10 +175,15 @@ repoviz/
 │   ├── architecture.md    # archmap / arch2 grammar: n=, e=, b=
 │   ├── flowchart.md       # mermaid flowchart, seq, lifecycle
 │   ├── sankey.md          # labels=, links=, weights, limits
-│   └── general-charts.md  # mindmap, gantt, auxiliary repo-metric charts
+│   ├── general-charts.md  # mindmap, gantt, auxiliary repo-metric charts
+│   ├── repository-ir.md   # evidence discipline, IR schema, 3-layer validation
+│   └── architecture-diff.md # impact mode: git diff → delta diagram + +/- summary
 ├── scripts/
-│   ├── export.sh          # URL → local .svg / .png (curl, with CLI fallback)
-│   └── build_html.sh      # URLs + notes → standalone dark/light HTML report
+│   ├── export.sh          # URL → local .svg / .png (single or --batch manifest)
+│   ├── shorten.sh         # chart JSON → permanent /draw/c/<hash> short link
+│   ├── build_html.sh      # URLs + notes + evidence → standalone HTML report
+│   ├── inject_readme.sh   # insert/update diagrams between repoviz markers in a README
+│   └── validate.sh        # L1 render check (SVG/PNG) + L2 IR structure check
 └── README.md
 ```
 

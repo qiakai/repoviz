@@ -116,9 +116,30 @@ git clone https://github.com/qiakai/repoviz ~/.cursor/skills/repoviz
 要支持暗色模式，方便分享给团队。
 ```
 
+**PR / 变更影响（变更架构图）：**
+
+```
+这个 PR 在架构上改了什么？基线是 main。把影响范围画成一张变更架构图，
+再附一份 +/- 摘要供评审参考。
+```
+
+**图表就地嵌入 README：**
+
+```
+把架构图画出来，直接放进我的 README.md，并且保留一个以后可以随时更新的区块。
+```
+
+**短链与批量导出：**
+
+```
+把桑基图导出成 2 倍 PNG、架构图导出成 SVG 存到 ./assets，再给桑基图生成一个
+永久短链——URL 太长了。
+```
+
 工作原理：agent 依据 `SKILL.md` 的路由表选图，带 token 预算地扫描清单与入口文件，
-输出扁平百分号编码的渲染 URL；仅在明确要求时调用 `scripts/export.sh` 或
-`scripts/build_html.sh` 做本地导出。
+输出扁平百分号编码的渲染 URL；仅在明确要求时调用 `scripts/export.sh`（单个或
+`--batch` 批量）、`scripts/shorten.sh`、`scripts/build_html.sh`（带可筛选的源码证据表、
+便于打印 PDF）、`scripts/inject_readme.sh` 或 `scripts/validate.sh`。
 
 ## 隐私与安全
 
@@ -144,10 +165,15 @@ repoviz/
 │   ├── architecture.md    # archmap / arch2 语法：n=、e=、b=
 │   ├── flowchart.md       # mermaid 流程图、seq 时序图、lifecycle 状态机
 │   ├── sankey.md          # labels=、links=、权重与限制
-│   └── general-charts.md  # mindmap、gantt 及仓库度量辅助图
+│   ├── general-charts.md  # mindmap、gantt 及仓库度量辅助图
+│   ├── repository-ir.md   # 源码证据纪律、IR schema、三层校验协议
+│   └── architecture-diff.md # impact 模式：git diff → 变更架构图 + +/- 摘要
 ├── scripts/
-│   ├── export.sh          # URL → 本地 .svg / .png（curl，支持 CLI 回退）
-│   └── build_html.sh      # URL + 备注 → 自包含暗/亮响应式 HTML 报告
+│   ├── export.sh          # URL → 本地 .svg / .png（单个或 --batch 清单）
+│   ├── shorten.sh         # 图表 JSON → 永久短链 /draw/c/<hash>
+│   ├── build_html.sh      # URL + 备注 + 证据 → 自包含暗/亮 HTML 报告
+│   ├── inject_readme.sh   # 在 README 的 repoviz 锚点间插入/更新图表
+│   └── validate.sh        # L1 渲染校验（SVG/PNG）+ L2 IR 结构校验
 └── README.md
 ```
 
